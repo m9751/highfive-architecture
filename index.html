@@ -164,7 +164,7 @@
       <a href="#s9">9. Implementation Resource Map</a>
       <a href="#s10">10. Cost-Benefit Estimate</a>
       <a href="#s11">11. AI Governance — Art of the Possible</a>
-      <a href="#s12">12. Persona-Specific Value</a>
+      <a href="#s12">12. Value by Function</a>
       <a href="#s13">13. Discovery & Validation Agenda</a>
     </div>
   </div>
@@ -181,34 +181,35 @@
 
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-value">62</div>
-      <div class="stat-label">Offices · 11 States</div>
+      <div class="stat-value">1.7×</div>
+      <div class="stat-label">Year 1 ROI — First API Pays for the Platform</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">40 min</div>
-      <div class="stat-label">Manual Referral Process</div>
+      <div class="stat-value" style="color:var(--red);">4 Agents</div>
+      <div class="stat-label">Operating Without PII Controls or HIPAA Audit Trail</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">0%</div>
-      <div class="stat-label">MuleSoft Utilization (5/7 metrics)</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value">4x</div>
+      <div class="stat-value">4×</div>
       <div class="stat-label">EBITDA Multiple Gap at Exit</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$25K</div>
+      <div class="stat-label">6-Month Investment · Go/No-Go at Month 6</div>
     </div>
   </div>
 
   <div class="card">
     <h3>The Challenge</h3>
-    <p style="font-weight:700; font-size:1.05rem; margin-bottom:10px; color:var(--sf-blue);">At 62 offices, HighFive is where Espire and SDP were before they hit the wall</p>
-    <p>HighFive Healthcare is a PE-backed Dental Services Organization scaling from 62 to 100+ offices on a $100M Norwest investment. CareStack went live on March 1, 2026, replacing four legacy PMS systems (Endovision, OMSVision, DSN, WinOMS) — a major infrastructure win. But every new practice acquisition still compounds manual overhead: 40-minute referral processes, hand-keyed data between CareStack, Salesforce, and Swell, and no cross-system orchestration. The MuleSoft platform was purchased for a future integration vision that never materialized: <strong>0% utilization on 5 of 7 core metrics, 2 support cases in 24 months.</strong></p>
+    <p style="font-weight:700; font-size:1.05rem; margin-bottom:10px; color:var(--sf-blue);">Four AI agents are processing patient data without a unified HIPAA policy — and the platform that solves this is sitting dormant</p>
+    <p>CareStack went live on March 1 — a major infrastructure win. But the systems around it (Salesforce, DoctorLogic, Swell, VoiceStack, OpenClaw) are not connected to it. Every practice acquisition compounds this gap: manual data re-entry across disconnected systems, AI agents operating without PII controls, and no cross-system orchestration. Meanwhile, MuleSoft — purchased to solve exactly this — has never been activated: <strong>0% utilization on 5 of 7 core metrics.</strong> The first integration built on this platform pays for the entire 6-month investment.</p>
   </div>
 
-  <div class="card">
-    <h3>The Opportunity</h3>
-    <p style="font-weight:700; font-size:1.05rem; margin-bottom:10px; color:var(--sf-blue);">Four AI agents operating independently is a governance gap — and an opportunity</p>
-    <p>CareStack VoiceStack (Agent #1), Salesforce Agentforce (Agent #2), OpenClaw (Agent #3), and DoctorLogic AI lead scoring (Agent #4) are operating independently across the organization. Agent Fabric does not just govern these agents — it <strong>enables</strong> new capabilities: a Recruitment Concierge that briefs recruiters before they pick up the phone, after-hours patient booking that creates CareStack appointments autonomously, and operational intelligence that surfaces patterns across 62 offices in real time. HIPAA governance and audit trails are byproducts of the architecture, not the headline.</p>
-    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px;"><em>Note: These Agent Fabric capabilities represent future state — they are enabled by the platform but are not included in the 6-month proof-of-value scope.</em></p>
+  <div class="card" style="border-left: 4px solid var(--red);">
+    <h3>The Risk You're Carrying Today</h3>
+    <p style="font-weight:700; font-size:1.05rem; margin-bottom:10px; color:var(--red);">Four AI agents are processing PHI without unified PII masking, audit trails, or HIPAA-compliant governance</p>
+    <p>VoiceStack, Agentforce, OpenClaw, and DoctorLogic AI are each handling patient data independently — four separate audit trails, four separate exposure surfaces, zero unified policy. A single unmasked PII incident in any of these agents creates regulatory, financial, and reputational risk that dwarfs the cost of the platform. Flex Gateway solves this at the infrastructure layer: PII masking, audit logging, and access control applied uniformly across all four agents.</p>
+    <p style="margin-top:12px;">Beyond risk mitigation, Agent Fabric <strong>enables</strong> new capabilities: a Recruitment Concierge that briefs recruiters before they answer the phone, after-hours booking that creates CareStack appointments autonomously, and operational intelligence that surfaces patterns in real time.</p>
+    <p style="font-size:0.85rem; color:var(--muted); margin-top:8px;"><em>Agent Fabric capabilities represent future state — enabled by the platform but not included in the 6-month proof-of-value scope.</em></p>
   </div>
 
   <div class="card">
@@ -554,7 +555,7 @@
   </div>
 
   <div class="card">
-    <h3>Key Data Flow: Referral Automation (Kills the 40-Min Process)</h3>
+    <h3>Example Data Flow: Lead-to-Appointment Automation</h3>
     <table>
       <thead><tr><th>Step</th><th>What Happens Today</th><th>What Changes with MuleSoft</th></tr></thead>
       <tbody>
@@ -604,9 +605,9 @@
           <td><span class="tag">MuleSoft Vibes</span></td>
         </tr>
         <tr>
-          <td><strong>Referral automation</strong><br><span style="font-size:0.8rem;color:var(--muted)">DoctorLogic → Salesforce → CareStack</span></td>
+          <td><strong>Cross-system process automation</strong><br><span style="font-size:0.8rem;color:var(--muted)">DoctorLogic → Salesforce → CareStack orchestration</span></td>
           <td><span class="fit-green">GREEN</span></td>
-          <td>Process API pattern. DoctorLogic webhook (live) → enrich → create SF Opportunity → create CareStack appointment. All connectors available or buildable.</td>
+          <td>Process API pattern. DoctorLogic webhook (live) → enrich → orchestrate across Salesforce and CareStack. Exact workflow scope depends on what CareStack handles natively vs. what requires cross-system orchestration. Month 1 discovery determines the right automation targets.</td>
           <td><span class="tag">Existing APIs</span></td>
         </tr>
         <tr>
@@ -654,7 +655,7 @@
   </div>
 
   <div class="card">
-    <h3>Honest Comparison: Azure/Fabric vs. MuleSoft Platform</h3>
+    <h3>Comparison: Azure/Fabric vs. MuleSoft Platform</h3>
     <table>
       <thead><tr><th>Dimension</th><th>Build on Azure/Fabric</th><th>MuleSoft Platform</th></tr></thead>
       <tbody>
@@ -709,7 +710,7 @@
   </div>
 
   <div class="card">
-    <h3>The Honest Conclusion</h3>
+    <h3>The Bottom Line</h3>
     <p>Your team has real Azure/Fabric expertise and has already built a working EDW pipeline — CareStack data is modeled, PowerBI dashboards are populated. That is valuable infrastructure. MuleSoft does not replace that — it complements it. Where Azure handles your data warehouse and BI layer, MuleSoft handles the multi-system orchestration, real-time event processing, and AI agent governance that sit above it. The question is not "build or buy" — it is "which layer needs which tool."</p>
   </div>
 </section>
@@ -729,7 +730,7 @@
           <td><strong>MuleSoft platform expiration at Apr 29 renewal</strong><br>Platform never activated despite 24 months of entitlements</td>
           <td><span class="risk-high">HIGH</span></td>
           <td>$25K 6-month bridge with milestones. Not a renewal negotiation — a structured POV. Mark needs to confirm by Mar 31.</td>
-          <td>Your MuleSoft team + Mark Edwards</td>
+          <td>MuleSoft team + Mark Edwards</td>
         </tr>
         <tr>
           <td><strong>Agent sprawl — 4 ungoverned AI agents</strong><br>No unified HIPAA policy, no audit trail</td>
@@ -753,13 +754,13 @@
           <td><strong>No implementation partner engaged</strong><br>MuleSoft was never activated because no one built it</td>
           <td><span class="risk-high">HIGH</span></td>
           <td>Implementation partner engagement required. This is why the platform was never activated. MuleSoft Vibes reduces implementation complexity for your existing team.</td>
-          <td>Your MuleSoft team + Mark Edwards</td>
+          <td>MuleSoft team + Mark Edwards</td>
         </tr>
         <tr>
-          <td><strong>Budget scrutiny from COO</strong><br>COO cut 52% CRM licenses Oct 2024</td>
+          <td><strong>Budget scrutiny</strong><br>Cost justification for continued platform investment</td>
           <td><span class="risk-med">MEDIUM</span></td>
           <td>$25K is less than 2 months of the current $44K run rate. Position as cost reduction (from $44K → $25K for 6 months) not new spend.</td>
-          <td>Angela Trull → COO internal sell</td>
+          <td>Angela Trull → leadership internal sell</td>
         </tr>
         <tr>
           <td><strong>PE exit readiness data gap</strong><br>No enterprise-level data aggregation for due diligence</td>
@@ -853,8 +854,8 @@
         <p>CareStack API evaluation and integration path selection. Sikka bridge assessment — transitional vs. direct CareStack API. VoiceStack API documentation review. OpenClaw registered in Agent Registry. Flex Gateway PII masking live. <strong>Deliverable:</strong> Architecture blueprint document for Knox's team.</p>
       </div>
       <div class="timeline-item">
-        <h4>Month 2 — Referral Automation Live</h4>
-        <p>DoctorLogic → Salesforce → CareStack automated. 40-minute manual process eliminated. First documented ROI — measurable time savings for Angela's team. <strong>Go/No-Go Gate:</strong> Referral automation operational.</p>
+        <h4>Month 2 — First Process API Live</h4>
+        <p>DoctorLogic → Salesforce → CareStack process automation deployed. Cross-system data flows validated. First documented ROI — measurable time savings. CareStack's native capabilities determine which workflows MuleSoft orchestrates vs. what CareStack handles natively. <strong>Go/No-Go Gate:</strong> At least one cross-system process automated and measured.</p>
       </div>
       <div class="timeline-item">
         <h4>Month 3 — OpenClaw + Agent Fabric Pilot</h4>
@@ -895,9 +896,9 @@
 
   <div class="callout-warn callout">
     <strong>POV Scope — IN vs OUT</strong>
-    <strong>IN:</strong> Referral automation, OpenClaw governance, VoiceStack pilot (1→10 offices), Norwest reporting, agent audit trail, CareStack API evaluation.<br>
+    <strong>IN:</strong> Cross-system process automation (lead-to-appointment, doctor onboarding), agent governance, VoiceStack pilot (1→10 offices), Norwest reporting, agent audit trail, CareStack API evaluation.<br>
     <strong>OUT:</strong> Intelligent Document Processing (Phase 2), patient MDM/dedup (Phase 2 Informatica), full 62-office VoiceStack rollout (requires pilot results), CareStack billing integration (separate engagement), Agent Fabric advanced use cases (Recruitment Concierge, after-hours booking — future state).<br>
-    <strong>Go/No-Go Criteria:</strong> (1) Referral process automated and measured, (2) At least 2 AI agents governed under Flex Gateway, (3) Board reporting feed operational, (4) Documented time/cost savings.
+    <strong>Go/No-Go Criteria:</strong> (1) At least one cross-system process automated and measured, (2) At least 2 AI agents governed under Flex Gateway, (3) Board reporting feed operational, (4) Documented time/cost savings.
   </div>
 </section>
 
@@ -952,10 +953,10 @@
     <table>
       <thead><tr><th>Input</th><th>Assumed Value</th><th>Source</th></tr></thead>
       <tbody>
-        <tr><td>Referral volume per month</td><td>200 referrals</td><td>Estimate — validate with Angela</td></tr>
-        <tr><td>Time per manual referral</td><td>40 minutes</td><td>Confirmed July 2025 call notes</td></tr>
-        <tr><td>Hourly cost of referral coordinator</td><td>$28/hr</td><td>Industry average — dental admin</td></tr>
-        <tr><td>Automation efficiency (conservative)</td><td>70% reduction</td><td>Conservative estimate — accounts for exceptions and manual overrides</td></tr>
+        <tr><td>Cross-system manual processes per month</td><td>200 transactions (leads, onboarding, data sync)</td><td>Estimate — validate with Angela/Knox</td></tr>
+        <tr><td>Average time per manual cross-system task</td><td>40 minutes</td><td>Confirmed July 2025 call notes (lead-to-appointment)</td></tr>
+        <tr><td>Hourly cost of coordinator</td><td>$28/hr</td><td>Industry average — dental admin</td></tr>
+        <tr><td>Automation efficiency (conservative)</td><td>70% reduction</td><td>Conservative — accounts for workflows CareStack handles natively</td></tr>
         <tr><td>New practice acquisitions per year</td><td>8-12</td><td>Based on $100M Norwest investment pace</td></tr>
         <tr><td>Manual hours per new practice onboarding (IT)</td><td>80 hours</td><td>Estimate — validate with Knox</td></tr>
         <tr><td>Board report prep time (per quarter)</td><td>40+ hours across ops team</td><td>Estimate — validate with Mark</td></tr>
@@ -969,7 +970,7 @@
       <thead><tr><th>Line Item</th><th>Without MuleSoft</th><th>With MuleSoft (6-Mo POV)</th></tr></thead>
       <tbody>
         <tr>
-          <td>Referral labor cost (200/mo x 40 min x $28/hr)</td>
+          <td>Cross-system manual labor (200/mo x 40 min x $28/hr)</td>
           <td>$44,800/yr</td>
           <td>~$13,440/yr (automated, 70% reduction = $31,360 saved)</td>
         </tr>
@@ -1076,11 +1077,11 @@
   </div>
 </section>
 
-<!-- ========== SECTION 12: PERSONA VALUE ========== -->
+<!-- ========== SECTION 12: VALUE BY FUNCTION ========== -->
 <section id="s12">
   <div class="section-header">
     <div class="section-num">12</div>
-    <h2>Persona-Specific Value</h2>
+    <h2>Value by Function</h2>
   </div>
 
   <div class="persona-grid">
@@ -1088,7 +1089,7 @@
       <h4>Angela Trull — Chief Growth Officer</h4>
       <p style="font-size:0.85rem; margin-bottom:8px;"><strong>Her world:</strong> Doctor recruitment, B2B business development, referral pipeline at 62 locations scaling to 100+. Salesforce CRM drives the growth pipeline.</p>
       <ul>
-        <li><strong>Referral automation</strong> — 40-min manual process eliminated. Her team stops being "human glue" between systems</li>
+        <li><strong>Cross-system automation</strong> — Manual data re-entry between DoctorLogic, Salesforce, and CareStack eliminated. Her team focuses on growth, not system glue</li>
         <li><strong>Growth dashboard</strong> — real-time B2B pipeline view across all offices, not manually compiled reports</li>
         <li><strong>Recruitment Concierge (future)</strong> — AI-powered candidate briefing before recruiter answers the phone. Protects close rate at scale</li>
       </ul>
@@ -1189,6 +1190,63 @@
     <p style="margin-top:4px; font-size:0.78rem; opacity:0.7;">Confidential — Prepared for HighFive Healthcare Leadership</p>
   </div>
 </footer>
+
+<!-- ========== ENGAGEMENT BEACON ========== -->
+<script>
+(function() {
+  var SB_URL = 'https://cnplogkxbjecdeeritdl.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNucGxvZ2t4YmplY2RlZXJpdGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMjAzMTUsImV4cCI6MjA4Nzg5NjMxNX0.WJ6edMljHiY-fku9G2OWm83y5wHWI5yZHvxtpYMCuWU';
+  var PROPOSAL_ID = 'highfive-architecture';
+  var SESSION_ID = 'sess_' + Math.random().toString(36).substr(2,15) + '_' + Date.now().toString(36);
+  var REF = new URLSearchParams(window.location.search).get('ref') || 'direct';
+
+  function sendEvent(eventType, slideNumber, slideTitle, durationSeconds) {
+    fetch(SB_URL + '/rest/v1/proposal_engagement', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({
+        proposal_id: PROPOSAL_ID,
+        session_id: SESSION_ID,
+        event_type: eventType,
+        slide_number: slideNumber,
+        slide_title: (slideTitle || '').substring(0, 60),
+        duration_seconds: durationSeconds || null,
+        referrer: REF,
+        user_agent: navigator.userAgent
+      })
+    }).catch(function(){});
+  }
+
+  // Track proposal open
+  sendEvent('proposal_opened', 0, 'Cover');
+
+  // Track section views with Intersection Observer
+  var slideTimers = {};
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      var slide = entry.target;
+      var num = parseInt(slide.dataset.slide || slide.id.replace(/\D/g,'') || '0');
+      var title = (slide.querySelector('h2, h1') || {}).textContent || '';
+      if (entry.isIntersecting) {
+        sendEvent('slide_viewed', num, title);
+        slideTimers[num] = Date.now();
+      } else if (slideTimers[num]) {
+        var dur = Math.round((Date.now() - slideTimers[num]) / 1000);
+        if (dur >= 2) sendEvent('time_on_slide', num, title, dur);
+        delete slideTimers[num];
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('section').forEach(function(s) {
+    observer.observe(s);
+  });
+})();
+</script>
 
 </body>
 </html>
