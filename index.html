@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HighFive Healthcare — Enterprise Integration Architecture Brief</title>
+<style>
+  :root {
+    --sf-blue: #032D60;
+    --mule-purple: #5B2E91;
+    --infa-orange: #FF6D2E;
+    --sf-cloud: #00A1E0;
+    --green: #2E844A;
+    --yellow: #DD7A01;
+    --red: #C23934;
+    --bg: #FAFBFC;
+    --card-bg: #FFFFFF;
+    --text: #1B2A4A;
+    --muted: #6B7B99;
+    --border: #E5E9F0;
+    --accent-gradient: linear-gradient(135deg, var(--sf-blue), var(--mule-purple));
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* COVER */
+  .cover { background: var(--accent-gradient); color: white; padding: 80px 0 60px; position: relative; overflow: hidden; }
+  .cover::after { content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: rgba(255,255,255,0.03); border-radius: 50%; }
+  .cover h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 1.15rem; opacity: 0.85; margin-bottom: 32px; max-width: 720px; }
+  .cover-meta { display: flex; gap: 32px; flex-wrap: wrap; font-size: 0.9rem; opacity: 0.75; }
+  .cover-meta span { display: flex; align-items: center; gap: 6px; }
+  .cover .badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 16px; }
+
+  /* NAV */
+  .toc { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px 32px; margin: -32px auto 40px; position: relative; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .toc h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+  .toc a { color: var(--sf-blue); text-decoration: none; font-size: 0.9rem; padding: 4px 0; display: block; }
+  .toc a:hover { color: var(--mule-purple); }
+
+  /* SECTIONS */
+  section { margin-bottom: 48px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+  .section-num { background: var(--accent-gradient); color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0; }
+  .section-header h2 { font-size: 1.5rem; font-weight: 700; }
+
+  /* CARDS */
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+  .card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+  /* TABLES */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+  th { background: #F0F3F8; font-weight: 600; text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: #F8FAFC; }
+
+  /* BADGES */
+  .fit-green { background: #E8F5E9; color: var(--green); padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+  .fit-yellow { background: #FFF3E0; color: var(--yellow); padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+  .fit-red { background: #FFEBEE; color: var(--red); padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+  .tag { display: inline-block; background: #EDE7F6; color: var(--mule-purple); padding: 2px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600; margin: 2px 4px 2px 0; }
+  .tag-infa { background: #FFF3E0; color: var(--infa-orange); }
+  .tag-sf { background: #E3F2FD; color: var(--sf-blue); }
+
+  /* RISK TABLE */
+  .risk-high { color: var(--red); font-weight: 700; }
+  .risk-med { color: var(--yellow); font-weight: 700; }
+  .risk-resolved { color: var(--green); font-weight: 700; }
+
+  /* SVG CONTAINER */
+  .diagram-container { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 20px 0; overflow-x: auto; }
+  .diagram-container svg { display: block; margin: 0 auto; }
+
+  /* CALLOUT */
+  .callout { background: #F3E8FF; border-left: 4px solid var(--mule-purple); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .callout-warn { background: #FFF8E1; border-left-color: var(--yellow); }
+  .callout-green { background: #E8F5E9; border-left-color: var(--green); }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  /* GAURAV */
+  .ask-gaurav { background: #FCE4EC; border: 1px dashed #E91E63; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 0.88rem; }
+  .ask-gaurav::before { content: '🔍 Ask Gaurav: '; font-weight: 700; color: #C2185B; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; text-align: center; }
+  .stat-card .stat-value { font-size: 1.8rem; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 32px; margin: 20px 0; }
+  .timeline::before { content: ''; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 24px; }
+  .timeline-item::before { content: ''; position: absolute; left: -26px; top: 4px; width: 14px; height: 14px; background: var(--mule-purple); border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px var(--mule-purple); }
+  .timeline-item h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .timeline-item p { font-size: 0.88rem; color: var(--muted); }
+
+  /* FOOTER */
+  footer { background: var(--sf-blue); color: white; padding: 32px 0; margin-top: 60px; text-align: center; font-size: 0.85rem; opacity: 0.9; }
+  footer a { color: #90CAF9; }
+
+  /* PERSONA TABS */
+  .persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .persona-card { border-left: 4px solid var(--sf-blue); padding: 16px; background: var(--card-bg); border-radius: 0 10px 10px 0; border: 1px solid var(--border); border-left: 4px solid var(--sf-blue); }
+  .persona-card h4 { font-size: 0.95rem; margin-bottom: 8px; }
+  .persona-card ul { font-size: 0.85rem; padding-left: 16px; }
+  .persona-card li { margin-bottom: 4px; }
+  .persona-card.cgo { border-left-color: #E91E63; }
+  .persona-card.vp-tech { border-left-color: var(--mule-purple); }
+  .persona-card.board { border-left-color: var(--green); }
+
+  @media (max-width: 768px) {
+    .cover h1 { font-size: 1.6rem; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media print {
+    .cover { padding: 40px 0 30px; }
+    .toc { box-shadow: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== COVER ========== -->
+<header class="cover">
+  <div class="container">
+    <div class="badge">SMOKINARCHITECT — ENTERPRISE INTEGRATION ARCHITECTURE</div>
+    <h1>HighFive Healthcare</h1>
+    <p class="subtitle">Enterprise Integration Architecture Brief — From 62 Offices to Platform Business. How MuleSoft + Agent Fabric transforms a scaling DSO from manual glue work to PE-grade integration infrastructure.</p>
+    <div class="cover-meta">
+      <span>📋 Prepared for Mark Edwards, Angela Trull, Knox Richardson</span>
+      <span>📅 March 2026</span>
+      <span>🏢 Dental Services Organization · 62 Offices · 11 States</span>
+      <span>💰 $100M Norwest · Recap 2027–28</span>
+    </div>
+  </div>
+</header>
+
+<!-- ========== TABLE OF CONTENTS ========== -->
+<div class="container">
+  <div class="toc">
+    <h3>Architecture Brief Contents</h3>
+    <div class="toc-grid">
+      <a href="#s1">1. Executive Summary</a>
+      <a href="#s2">2. Current State Architecture</a>
+      <a href="#s3">3. Target Architecture & Data Flows</a>
+      <a href="#s4">4. Fit Assessment</a>
+      <a href="#s5">5. Risk Concentration</a>
+      <a href="#s6">6. What Changes for Your Team</a>
+      <a href="#s7">7. Implementation Roadmap</a>
+      <a href="#s8">8. Cost-Benefit Estimate</a>
+      <a href="#s9">9. Persona-Specific Value</a>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+<!-- ========== SECTION 1: EXECUTIVE SUMMARY ========== -->
+<section id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Executive Summary</h2>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value">62</div>
+      <div class="stat-label">Offices · 11 States</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">40 min</div>
+      <div class="stat-label">Manual Referral Process</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0%</div>
+      <div class="stat-label">MuleSoft Utilization (5/7 metrics)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">4×</div>
+      <div class="stat-label">EBITDA Multiple Gap at Exit</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Problem</h3>
+    <p>HighFive Healthcare is a PE-backed Dental Services Organization scaling from 62 to 100+ offices on a $100M Norwest investment. Every new practice acquisition compounds manual overhead — 40-minute referral processes, hand-keyed data between CareStack, Salesforce, and Swell, zero cross-office enterprise reporting. The MuleSoft platform was purchased for a future integration vision that never materialized: <strong>0% utilization on 5 of 7 core metrics, 2 support cases in 24 months.</strong></p>
+  </div>
+
+  <div class="card">
+    <h3>Cost of the Current Path</h3>
+    <p>Specialized Dental Partners — same founding year (2018), same PE model, now 3.6× larger at 275+ offices — hit the integration wall with 12 fragmented PMS systems and no unified data layer. Their CEO publicly acknowledged in January 2026: <em>"We're going to make mistakes"</em> on technology. Reactive band-aids (Pearly for A/R, Coupa for spend) cost more and solve less than a proactive integration layer. HighFive is at the exact inflection point where the foundation is cheaper to build at 62 offices than at 200.</p>
+  </div>
+
+  <div class="card">
+    <h3>Highest Risk</h3>
+    <p><strong>Agent sprawl without governance.</strong> CareStack VoiceStack™ (Agent #1), Salesforce Agentforce (Agent #2), OpenClaw (Agent #3), DoctorLogic AI lead scoring (Agent #4) — four AI agents, four audit trails, zero unified HIPAA policy. Gartner's August 2025 research gives organizations a 3–6 month window to define an agentic AI strategy before inheriting unmanaged agent sprawl. MuleSoft Agent Fabric is the governance layer that prevents this.</p>
+  </div>
+
+  <div class="card">
+    <h3>What Actually Changes</h3>
+    <p>A 6-month structured proof-of-value that activates the MuleSoft platform already owned, builds the CareStack integration bridge, governs AI agents under Flex Gateway, and produces documented ROI for Norwest's board package. Not a renewal negotiation — a $25K architectural investment with milestones and a clean go/no-go at month 6.</p>
+  </div>
+
+  <div class="callout-green callout">
+    <strong>Recommended Next Step</strong>
+    Mark Edwards confirms 6-month term ($25K) by March 31 → Knox Richardson + Angela Trull technical session week of March 17 → Month 1 architecture blueprint delivered.
+  </div>
+</section>
+
+<!-- ========== SECTION 2: CURRENT STATE ARCHITECTURE ========== -->
+<section id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Current State Architecture</h2>
+  </div>
+
+  <div class="card">
+    <h3>System Landscape</h3>
+    <table>
+      <thead>
+        <tr><th>Layer</th><th>System</th><th>Role</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>PMS</strong></td><td>CareStack</td><td>Clinical, scheduling, billing per office (62 instances)</td><td><span class="fit-green">LIVE</span> — pilot Sep 2024, rolling out</td></tr>
+        <tr><td><strong>CRM</strong></td><td>Salesforce</td><td>Recruitment pipeline, referring doctor management, market expansion</td><td><span class="fit-green">LIVE</span> — $20.6K ARR</td></tr>
+        <tr><td><strong>Integration</strong></td><td>MuleSoft Anypoint</td><td>4 APIs active: DoctorLogic webhook, Swell, Sikka, nettools-dev</td><td><span class="fit-yellow">UNDERUTILIZED</span> — 0% on 5/7 metrics</td></tr>
+        <tr><td><strong>Marketing</strong></td><td>DoctorLogic</td><td>Web platform, SEO, patient lead capture</td><td><span class="fit-green">LIVE</span> — webhook to MuleSoft active</td></tr>
+        <tr><td><strong>Patient Engagement</strong></td><td>Swell</td><td>Reviews, patient communications</td><td><span class="fit-yellow">API EXISTS</span> — underutilized</td></tr>
+        <tr><td><strong>Practice Analytics</strong></td><td>Sikka</td><td>Practice management metrics aggregation</td><td><span class="fit-yellow">API EXISTS</span> — underutilized</td></tr>
+        <tr><td><strong>AI Tools</strong></td><td>OpenClaw</td><td>AI agent engine (Mark's current tooling)</td><td><span class="fit-red">UNGOVERNED</span> — no HIPAA audit trail</td></tr>
+        <tr><td><strong>VoIP</strong></td><td>Legacy + Cloud</td><td>Office phone systems, after-hours routing</td><td><span class="fit-yellow">FRAGMENTED</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SVG: CURRENT STATE DIAGRAM -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" style="max-width:960px; width:100%;">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#6B7B99"/></marker>
+        <linearGradient id="gMule" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5B2E91"/><stop offset="100%" stop-color="#7C4DFF"/></linearGradient>
+        <linearGradient id="gSF" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#032D60"/><stop offset="100%" stop-color="#00A1E0"/></linearGradient>
+      </defs>
+      <!-- Title -->
+      <text x="480" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">CURRENT STATE — HighFive Healthcare Integration Landscape</text>
+      <text x="480" y="46" text-anchor="middle" font-size="11" fill="#6B7B99">Manual processes · Fragmented systems · No enterprise integration layer active</text>
+
+      <!-- Left: Office Systems -->
+      <rect x="20" y="80" width="200" height="60" rx="8" fill="#E8F5E9" stroke="#2E844A" stroke-width="1.5"/>
+      <text x="120" y="107" text-anchor="middle" font-size="12" font-weight="600" fill="#1B5E20">CareStack PMS</text>
+      <text x="120" y="124" text-anchor="middle" font-size="10" fill="#2E7D32">62 instances · Clinical + Billing</text>
+
+      <rect x="20" y="160" width="200" height="60" rx="8" fill="#E3F2FD" stroke="#1565C0" stroke-width="1.5"/>
+      <text x="120" y="187" text-anchor="middle" font-size="12" font-weight="600" fill="#0D47A1">Salesforce CRM</text>
+      <text x="120" y="204" text-anchor="middle" font-size="10" fill="#1565C0">Recruitment · Growth Pipeline</text>
+
+      <rect x="20" y="240" width="200" height="50" rx="8" fill="#FFF3E0" stroke="#E65100" stroke-width="1.5"/>
+      <text x="120" y="262" text-anchor="middle" font-size="12" font-weight="600" fill="#BF360C">DoctorLogic</text>
+      <text x="120" y="278" text-anchor="middle" font-size="10" fill="#E65100">Web · SEO · Patient Leads</text>
+
+      <rect x="20" y="310" width="95" height="45" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.5"/>
+      <text x="68" y="331" text-anchor="middle" font-size="11" font-weight="600" fill="#4A148C">Swell</text>
+      <text x="68" y="345" text-anchor="middle" font-size="9" fill="#7B1FA2">Reviews</text>
+
+      <rect x="125" y="310" width="95" height="45" rx="8" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1.5"/>
+      <text x="173" y="331" text-anchor="middle" font-size="11" font-weight="600" fill="#4A148C">Sikka</text>
+      <text x="173" y="345" text-anchor="middle" font-size="9" fill="#7B1FA2">Analytics</text>
+
+      <!-- Center: Manual Processes (the problem) -->
+      <rect x="310" y="100" width="340" height="280" rx="12" fill="#FFF8E1" stroke="#F9A825" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="480" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#F57F17">⚠ MANUAL PROCESSES (Current State)</text>
+
+      <rect x="335" y="145" width="290" height="40" rx="6" fill="white" stroke="#FFCC02" stroke-width="1"/>
+      <text x="480" y="163" text-anchor="middle" font-size="11" fill="#5D4037">🕐 40-min referral: DoctorLogic → hand-type → Salesforce</text>
+      <text x="480" y="177" text-anchor="middle" font-size="9" fill="#8D6E63">Angela's team as human glue</text>
+
+      <rect x="335" y="195" width="290" height="40" rx="6" fill="white" stroke="#FFCC02" stroke-width="1"/>
+      <text x="480" y="213" text-anchor="middle" font-size="11" fill="#5D4037">📋 Doctor onboarding: manual re-entry across 3 systems</text>
+      <text x="480" y="227" text-anchor="middle" font-size="9" fill="#8D6E63">CareStack + Salesforce + Payroll</text>
+
+      <rect x="335" y="245" width="290" height="40" rx="6" fill="white" stroke="#FFCC02" stroke-width="1"/>
+      <text x="480" y="263" text-anchor="middle" font-size="11" fill="#5D4037">📊 Board reporting: manually compiled from 62 offices</text>
+      <text x="480" y="277" text-anchor="middle" font-size="9" fill="#8D6E63">Norwest data requests take days</text>
+
+      <rect x="335" y="295" width="290" height="40" rx="6" fill="white" stroke="#FFCC02" stroke-width="1"/>
+      <text x="480" y="313" text-anchor="middle" font-size="11" fill="#5D4037">🤖 4 AI agents · 0 governance · 0 unified HIPAA policy</text>
+      <text x="480" y="327" text-anchor="middle" font-size="9" fill="#8D6E63">OpenClaw, VoiceStack, Agentforce, DoctorLogic AI</text>
+
+      <rect x="335" y="345" width="290" height="25" rx="4" fill="#FFEBEE" stroke="#E53935" stroke-width="1"/>
+      <text x="480" y="362" text-anchor="middle" font-size="10" font-weight="600" fill="#C62828">Growth Tax: compounds with every new office acquired</text>
+
+      <!-- Right: MuleSoft (dormant) -->
+      <rect x="740" y="120" width="200" height="240" rx="12" fill="#F5F0FF" stroke="#5B2E91" stroke-width="2" opacity="0.5"/>
+      <text x="840" y="148" text-anchor="middle" font-size="13" font-weight="700" fill="#5B2E91">MuleSoft Anypoint</text>
+      <text x="840" y="166" text-anchor="middle" font-size="10" fill="#7C4DFF">PURCHASED · NOT ACTIVATED</text>
+
+      <rect x="760" y="185" width="160" height="28" rx="4" fill="white" stroke="#A5D6A7" stroke-width="1"/>
+      <text x="840" y="203" text-anchor="middle" font-size="10" fill="#2E7D32">✓ doctor-logic-webhook</text>
+      <rect x="760" y="220" width="160" height="28" rx="4" fill="white" stroke="#A5D6A7" stroke-width="1"/>
+      <text x="840" y="238" text-anchor="middle" font-size="10" fill="#2E7D32">✓ high5-swell-prc-api</text>
+      <rect x="760" y="255" width="160" height="28" rx="4" fill="white" stroke="#A5D6A7" stroke-width="1"/>
+      <text x="840" y="273" text-anchor="middle" font-size="10" fill="#2E7D32">✓ high5-sikka-blob-api</text>
+      <rect x="760" y="290" width="160" height="28" rx="4" fill="white" stroke="#FFCDD2" stroke-width="1"/>
+      <text x="840" y="308" text-anchor="middle" font-size="10" fill="#C62828">✗ No Process APIs</text>
+      <rect x="760" y="325" width="160" height="28" rx="4" fill="white" stroke="#FFCDD2" stroke-width="1"/>
+      <text x="840" y="343" text-anchor="middle" font-size="10" fill="#C62828">✗ No Experience APIs</text>
+
+      <!-- Arrows: systems → manual processes -->
+      <line x1="220" y1="110" x2="308" y2="160" stroke="#6B7B99" stroke-width="1.2" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+      <line x1="220" y1="190" x2="308" y2="200" stroke="#6B7B99" stroke-width="1.2" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+      <line x1="220" y1="265" x2="308" y2="240" stroke="#6B7B99" stroke-width="1.2" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+
+      <!-- Bottom annotation -->
+      <text x="480" y="420" text-anchor="middle" font-size="12" font-weight="600" fill="#C62828">$44K MuleSoft ARR · 0% Utilization on 5/7 Metrics · Renewal Apr 29, 2026</text>
+      <text x="480" y="440" text-anchor="middle" font-size="10" fill="#6B7B99">No SI partner engaged · No implementation plan · COO cut 52% CRM licenses Oct 2024</text>
+
+      <!-- Legend -->
+      <rect x="280" y="465" width="12" height="12" rx="2" fill="#E8F5E9" stroke="#2E844A"/>
+      <text x="298" y="476" font-size="10" fill="#6B7B99">Active</text>
+      <rect x="370" y="465" width="12" height="12" rx="2" fill="#FFF8E1" stroke="#F9A825"/>
+      <text x="388" y="476" font-size="10" fill="#6B7B99">Manual/Gap</text>
+      <rect x="470" y="465" width="12" height="12" rx="2" fill="#F5F0FF" stroke="#5B2E91" opacity="0.5"/>
+      <text x="488" y="476" font-size="10" fill="#6B7B99">Dormant</text>
+      <rect x="560" y="465" width="12" height="12" rx="2" fill="#FFEBEE" stroke="#E53935"/>
+      <text x="578" y="476" font-size="10" fill="#6B7B99">Risk</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ========== SECTION 3: TARGET ARCHITECTURE ========== -->
+<section id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Target Architecture & Data Flows</h2>
+  </div>
+
+  <!-- SVG: TARGET STATE — API-LED + AGENT FABRIC -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" style="max-width:960px; width:100%;">
+      <defs>
+        <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#5B2E91"/></marker>
+        <marker id="arr3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#00A1E0"/></marker>
+      </defs>
+
+      <text x="480" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1B2A4A">TARGET STATE — MuleSoft API-Led + Agent Fabric Architecture</text>
+      <text x="480" y="46" text-anchor="middle" font-size="11" fill="#6B7B99">Three-tier API design · Agent governance · PE-ready observability · Built on existing entitlements</text>
+
+      <!-- INGRESS (Left Column) -->
+      <text x="100" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2A4A">SOURCES</text>
+
+      <rect x="20" y="92" width="160" height="44" rx="6" fill="#E8F5E9" stroke="#2E844A" stroke-width="1.5"/>
+      <text x="100" y="112" text-anchor="middle" font-size="11" font-weight="600" fill="#1B5E20">CareStack PMS</text>
+      <text x="100" y="126" text-anchor="middle" font-size="9" fill="#2E7D32">62 instances · REST API</text>
+
+      <rect x="20" y="146" width="160" height="44" rx="6" fill="#E3F2FD" stroke="#1565C0" stroke-width="1.5"/>
+      <text x="100" y="166" text-anchor="middle" font-size="11" font-weight="600" fill="#0D47A1">Salesforce CRM</text>
+      <text x="100" y="180" text-anchor="middle" font-size="9" fill="#1565C0">Composite API · CDC</text>
+
+      <rect x="20" y="200" width="160" height="44" rx="6" fill="#FFF3E0" stroke="#E65100" stroke-width="1.5"/>
+      <text x="100" y="220" text-anchor="middle" font-size="11" font-weight="600" fill="#BF360C">DoctorLogic</text>
+      <text x="100" y="234" text-anchor="middle" font-size="9" fill="#E65100">Webhook (live)</text>
+
+      <rect x="20" y="254" width="75" height="38" rx="6" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1"/>
+      <text x="58" y="277" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Swell</text>
+      <rect x="105" y="254" width="75" height="38" rx="6" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1"/>
+      <text x="143" y="277" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Sikka</text>
+
+      <rect x="20" y="302" width="160" height="44" rx="6" fill="#ECEFF1" stroke="#546E7A" stroke-width="1.5"/>
+      <text x="100" y="322" text-anchor="middle" font-size="11" font-weight="600" fill="#37474F">VoIP Systems</text>
+      <text x="100" y="336" text-anchor="middle" font-size="9" fill="#546E7A">Legacy + Cloud · SIPREC</text>
+
+      <!-- SYSTEM API LAYER -->
+      <rect x="220" y="85" width="130" height="270" rx="10" fill="#EDE7F6" stroke="#5B2E91" stroke-width="2"/>
+      <text x="285" y="106" text-anchor="middle" font-size="11" font-weight="700" fill="#5B2E91">SYSTEM APIs</text>
+
+      <rect x="232" y="115" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="134" text-anchor="middle" font-size="9" fill="#4A148C">carestack-sys-api</text>
+      <rect x="232" y="152" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="171" text-anchor="middle" font-size="9" fill="#4A148C">salesforce-sys-api</text>
+      <rect x="232" y="189" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="208" text-anchor="middle" font-size="9" fill="#4A148C">doctorlogic-sys-api</text>
+      <rect x="232" y="226" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="245" text-anchor="middle" font-size="9" fill="#4A148C">swell-sys-api</text>
+      <rect x="232" y="263" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="282" text-anchor="middle" font-size="9" fill="#4A148C">sikka-sys-api</text>
+      <rect x="232" y="300" width="106" height="30" rx="4" fill="white" stroke="#B39DDB" stroke-width="1"/>
+      <text x="285" y="319" text-anchor="middle" font-size="9" fill="#4A148C">voip-sys-api</text>
+
+      <!-- Arrows: Sources → System APIs -->
+      <line x1="180" y1="114" x2="230" y2="130" stroke="#5B2E91" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="180" y1="168" x2="230" y2="167" stroke="#5B2E91" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="180" y1="222" x2="230" y2="204" stroke="#5B2E91" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="180" y1="273" x2="230" y2="248" stroke="#5B2E91" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="180" y1="324" x2="230" y2="315" stroke="#5B2E91" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- PROCESS API LAYER -->
+      <rect x="390" y="85" width="180" height="270" rx="10" fill="#E8EAF6" stroke="#283593" stroke-width="2"/>
+      <text x="480" y="106" text-anchor="middle" font-size="11" font-weight="700" fill="#283593">PROCESS APIs</text>
+
+      <rect x="402" y="115" width="156" height="34" rx="4" fill="white" stroke="#7986CB" stroke-width="1"/>
+      <text x="480" y="131" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1A237E">referral-automation-prc</text>
+      <text x="480" y="143" text-anchor="middle" font-size="8" fill="#5C6BC0">DoctorLogic→SF→CareStack</text>
+
+      <rect x="402" y="155" width="156" height="34" rx="4" fill="white" stroke="#7986CB" stroke-width="1"/>
+      <text x="480" y="171" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1A237E">recruitment-concierge-prc</text>
+      <text x="480" y="183" text-anchor="middle" font-size="8" fill="#5C6BC0">VoIP+SF+AI candidate briefing</text>
+
+      <rect x="402" y="195" width="156" height="34" rx="4" fill="white" stroke="#7986CB" stroke-width="1"/>
+      <text x="480" y="211" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1A237E">doctor-onboarding-prc</text>
+      <text x="480" y="223" text-anchor="middle" font-size="8" fill="#5C6BC0">Credential→SF→CareStack→Payroll</text>
+
+      <rect x="402" y="235" width="156" height="34" rx="4" fill="white" stroke="#7986CB" stroke-width="1"/>
+      <text x="480" y="251" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1A237E">board-reporting-prc</text>
+      <text x="480" y="263" text-anchor="middle" font-size="8" fill="#5C6BC0">62 offices → unified Norwest feed</text>
+
+      <rect x="402" y="275" width="156" height="34" rx="4" fill="white" stroke="#7986CB" stroke-width="1"/>
+      <text x="480" y="291" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1A237E">ops-intelligence-prc</text>
+      <text x="480" y="303" text-anchor="middle" font-size="8" fill="#5C6BC0">Trigger: cancel/no-show/capacity</text>
+
+      <!-- Arrows: System → Process -->
+      <line x1="350" y1="135" x2="400" y2="130" stroke="#283593" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="350" y1="170" x2="400" y2="170" stroke="#283593" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="350" y1="210" x2="400" y2="210" stroke="#283593" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="350" y1="250" x2="400" y2="250" stroke="#283593" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="350" y1="290" x2="400" y2="290" stroke="#283593" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- EXPERIENCE API LAYER -->
+      <rect x="610" y="85" width="160" height="270" rx="10" fill="#E0F2F1" stroke="#00695C" stroke-width="2"/>
+      <text x="690" y="106" text-anchor="middle" font-size="11" font-weight="700" fill="#00695C">EXPERIENCE APIs</text>
+
+      <rect x="622" y="118" width="136" height="30" rx="4" fill="white" stroke="#80CBC4" stroke-width="1"/>
+      <text x="690" y="137" text-anchor="middle" font-size="9.5" fill="#004D40">angela-growth-dashboard</text>
+
+      <rect x="622" y="155" width="136" height="30" rx="4" fill="white" stroke="#80CBC4" stroke-width="1"/>
+      <text x="690" y="174" text-anchor="middle" font-size="9.5" fill="#004D40">mark-ops-unified-view</text>
+
+      <rect x="622" y="192" width="136" height="30" rx="4" fill="white" stroke="#80CBC4" stroke-width="1"/>
+      <text x="690" y="211" text-anchor="middle" font-size="9.5" fill="#004D40">norwest-board-reporting</text>
+
+      <rect x="622" y="229" width="136" height="30" rx="4" fill="white" stroke="#80CBC4" stroke-width="1"/>
+      <text x="690" y="248" text-anchor="middle" font-size="9.5" fill="#004D40">patient-booking-exp</text>
+
+      <rect x="622" y="266" width="136" height="30" rx="4" fill="white" stroke="#80CBC4" stroke-width="1"/>
+      <text x="690" y="285" text-anchor="middle" font-size="9.5" fill="#004D40">agent-action-catalog</text>
+
+      <!-- Consumers -->
+      <text x="860" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#1B2A4A">CONSUMERS</text>
+      <rect x="800" y="112" width="140" height="30" rx="6" fill="#FCE4EC" stroke="#AD1457"/><text x="870" y="131" text-anchor="middle" font-size="10" fill="#880E4F">Angela · CGO</text>
+      <rect x="800" y="150" width="140" height="30" rx="6" fill="#E8EAF6" stroke="#283593"/><text x="870" y="169" text-anchor="middle" font-size="10" fill="#1A237E">Mark · VP Tech</text>
+      <rect x="800" y="188" width="140" height="30" rx="6" fill="#E8F5E9" stroke="#2E7D32"/><text x="870" y="207" text-anchor="middle" font-size="10" fill="#1B5E20">Dr. Harris · Board</text>
+      <rect x="800" y="226" width="140" height="30" rx="6" fill="#FFF3E0" stroke="#E65100"/><text x="870" y="245" text-anchor="middle" font-size="10" fill="#BF360C">Patients · Web</text>
+      <rect x="800" y="264" width="140" height="30" rx="6" fill="#F3E5F5" stroke="#6A1B9A"/><text x="870" y="283" text-anchor="middle" font-size="10" fill="#4A148C">AI Agents</text>
+
+      <line x1="770" y1="133" x2="798" y2="127" stroke="#00695C" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="770" y1="170" x2="798" y2="165" stroke="#00695C" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="770" y1="207" x2="798" y2="203" stroke="#00695C" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="770" y1="244" x2="798" y2="241" stroke="#00695C" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="770" y1="281" x2="798" y2="279" stroke="#00695C" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- AGENT FABRIC (Bottom) -->
+      <rect x="220" y="395" width="560" height="140" rx="12" fill="#F5F0FF" stroke="#5B2E91" stroke-width="2"/>
+      <text x="500" y="418" text-anchor="middle" font-size="13" font-weight="700" fill="#5B2E91">MULESOFT AGENT FABRIC — AI GOVERNANCE LAYER</text>
+
+      <!-- 4 Pillars -->
+      <rect x="240" y="430" width="120" height="50" rx="6" fill="white" stroke="#B39DDB"/>
+      <text x="300" y="452" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Agent Registry</text>
+      <text x="300" y="466" text-anchor="middle" font-size="8" fill="#7C4DFF">Discover · Catalog</text>
+
+      <rect x="375" y="430" width="120" height="50" rx="6" fill="white" stroke="#B39DDB"/>
+      <text x="435" y="452" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Agent Broker</text>
+      <text x="435" y="466" text-anchor="middle" font-size="8" fill="#7C4DFF">Orchestrate · Route</text>
+
+      <rect x="510" y="430" width="120" height="50" rx="6" fill="white" stroke="#B39DDB"/>
+      <text x="570" y="452" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Flex Gateway</text>
+      <text x="570" y="466" text-anchor="middle" font-size="8" fill="#7C4DFF">PII Mask · HIPAA</text>
+
+      <rect x="645" y="430" width="120" height="50" rx="6" fill="white" stroke="#B39DDB"/>
+      <text x="705" y="452" text-anchor="middle" font-size="10" font-weight="600" fill="#4A148C">Agent Visualizer</text>
+      <text x="705" y="466" text-anchor="middle" font-size="8" fill="#7C4DFF">Audit · PE-Ready</text>
+
+      <!-- AI Agents governed -->
+      <rect x="240" y="490" width="520" height="36" rx="6" fill="#EDE7F6" stroke="#9575CD"/>
+      <text x="500" y="512" text-anchor="middle" font-size="10" fill="#4A148C">OpenClaw · CareStack VoiceStack™ · Salesforce Agentforce · DoctorLogic AI · Recruitment Concierge</text>
+
+      <!-- Connection: API layers → Agent Fabric -->
+      <line x1="480" y1="358" x2="480" y2="393" stroke="#5B2E91" stroke-width="1.5" marker-end="url(#arr2)" stroke-dasharray="4,3"/>
+      <text x="485" y="380" font-size="9" fill="#5B2E91">MCP · A2A</text>
+
+      <!-- Legend -->
+      <rect x="240" y="560" width="10" height="10" rx="2" fill="#EDE7F6" stroke="#5B2E91"/>
+      <text x="256" y="570" font-size="9" fill="#6B7B99">System APIs</text>
+      <rect x="340" y="560" width="10" height="10" rx="2" fill="#E8EAF6" stroke="#283593"/>
+      <text x="356" y="570" font-size="9" fill="#6B7B99">Process APIs</text>
+      <rect x="440" y="560" width="10" height="10" rx="2" fill="#E0F2F1" stroke="#00695C"/>
+      <text x="456" y="570" font-size="9" fill="#6B7B99">Experience APIs</text>
+      <rect x="560" y="560" width="10" height="10" rx="2" fill="#F5F0FF" stroke="#5B2E91"/>
+      <text x="576" y="570" font-size="9" fill="#6B7B99">Agent Fabric</text>
+
+      <text x="480" y="600" text-anchor="middle" font-size="10" fill="#6B7B99">Every API built once is reused for every new office acquisition. CareStack connector reused across all 62 instances.</text>
+      <text x="480" y="618" text-anchor="middle" font-size="10" font-weight="600" fill="#5B2E91">Built on Anypoint Platform — existing HighFive entitlements. No new procurement required.</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3>Key Data Flow: Referral Automation (Kills the 40-Min Process)</h3>
+    <table>
+      <thead><tr><th>Step</th><th>What Happens Today</th><th>What Changes with MuleSoft</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Patient lead arrives via DoctorLogic</td><td>DoctorLogic webhook → <code>doctorlogic-sys-api</code> (already live)</td></tr>
+        <tr><td>2</td><td>Angela's team hand-types lead into Salesforce (15 min)</td><td><code>referral-automation-prc</code> creates SF Opportunity automatically</td></tr>
+        <tr><td>3</td><td>Referring doctor info manually looked up (10 min)</td><td>Process API enriches from Swell + Sikka provider data</td></tr>
+        <tr><td>4</td><td>CareStack appointment manually created (10 min)</td><td><code>carestack-sys-api</code> creates appointment + patient record</td></tr>
+        <tr><td>5</td><td>Confirmation manually sent (5 min)</td><td>Experience API triggers patient confirmation via Swell</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>40 minutes · manual · error-prone</strong></td><td><strong>&lt; 30 seconds · automated · auditable</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>The Compounding Principle</strong>
+    Every System API built for one use case is reusable for the next. The <code>carestack-sys-api</code> built for referral automation is reused for doctor onboarding, after-hours booking, and board reporting. At 62 offices scaling to 100+, this compounding is the difference between linear cost growth and logarithmic.
+  </div>
+</section>
+
+<!-- ========== SECTION 4: FIT ASSESSMENT ========== -->
+<section id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Fit Assessment</h2>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Capability</th><th>Fit</th><th>Recommendation</th><th>Accelerator</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Multi-system integration orchestration</strong><br><span style="font-size:0.8rem;color:var(--muted)">CareStack ↔ Salesforce ↔ Swell ↔ Sikka ↔ VoIP</span></td>
+          <td><span class="fit-green">GREEN</span></td>
+          <td>Core MuleSoft value prop. API-led three-tier (System→Process→Experience) is designed for exactly this pattern. Existing DoctorLogic webhook proves the platform works in this environment.</td>
+          <td><span class="tag">API-Led Connectivity</span></td>
+        </tr>
+        <tr>
+          <td><strong>AI agent governance</strong><br><span style="font-size:0.8rem;color:var(--muted)">OpenClaw, VoiceStack, Agentforce, DoctorLogic AI</span></td>
+          <td><span class="fit-green">GREEN</span></td>
+          <td>Agent Fabric's 4 pillars (Registry, Broker, Flex Gateway, Visualizer) are purpose-built for multi-agent governance. Flex Gateway PII masking prevents PHI exposure to external LLMs.</td>
+          <td><span class="tag">Agent Fabric</span></td>
+        </tr>
+        <tr>
+          <td><strong>Referral automation</strong><br><span style="font-size:0.8rem;color:var(--muted)">DoctorLogic → Salesforce → CareStack</span></td>
+          <td><span class="fit-green">GREEN</span></td>
+          <td>Process API pattern. DoctorLogic webhook (live) → enrich → create SF Opportunity → create CareStack appointment. All connectors available.</td>
+          <td><span class="tag">Existing APIs</span></td>
+        </tr>
+        <tr>
+          <td><strong>Enterprise reporting across 62 offices</strong><br><span style="font-size:0.8rem;color:var(--muted)">Unified Norwest board feed</span></td>
+          <td><span class="fit-green">GREEN</span></td>
+          <td>Experience API aggregates data from CareStack (62 instances) + Salesforce + Sikka into unified feed. CareStack customer Espire Dental (30+ locations) required 27M API calls for the same pattern.</td>
+          <td><span class="tag">Process API</span></td>
+        </tr>
+        <tr>
+          <td><strong>VoIP + AI recruitment concierge</strong><br><span style="font-size:0.8rem;color:var(--muted)">Real-time candidate briefing from VoIP events</span></td>
+          <td><span class="fit-yellow">YELLOW</span></td>
+          <td>Technically sound (SIPREC capture → MuleSoft → Salesforce lookup → AI briefing). Requires VoIP system evaluation and potential upgrade. Pilot at 1 office first.</td>
+          <td><span class="tag">Agent Broker</span></td>
+        </tr>
+        <tr>
+          <td><strong>Intelligent Document Processing</strong><br><span style="font-size:0.8rem;color:var(--muted)">CV/license/DEA extraction for doctor onboarding</span></td>
+          <td><span class="fit-yellow">YELLOW</span></td>
+          <td>MuleSoft IDP is a real capability but not included in current 6-month scope. Position as Phase 2 after integration foundation is proven.</td>
+          <td><span class="tag">Phase 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>CareStack native integration replacement</strong><br><span style="font-size:0.8rem;color:var(--muted)">Does CareStack make MuleSoft redundant?</span></td>
+          <td><span class="fit-green">GREEN</span></td>
+          <td><strong>No.</strong> CareStack handles per-office operations. MuleSoft handles cross-system orchestration, enterprise reporting, and AI governance. CareStack is the Practice OS; MuleSoft is the Nervous System. Espire Dental (CareStack customer, 30+ locations) validates this.</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>Data quality / Patient MDM</strong><br><span style="font-size:0.8rem;color:var(--muted)">Deduplication across 62 CareStack instances</span></td>
+          <td><span class="fit-yellow">YELLOW</span></td>
+          <td>Not in 6-month scope but a <strong>Phase 2 Informatica IDMC play</strong> when HighFive hits 100+ offices. CareStack per-office data will diverge without MDM. Flag for future.</td>
+          <td><span class="tag-infa tag">Informatica MDM</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ask-gaurav">Validate VoIP/SIPREC integration feasibility for dental DSO environments. HighFive's VoIP stack is fragmented (legacy + cloud) — is SIPREC realistic, or should we recommend SIP-based call events instead?</div>
+</section>
+
+<!-- ========== SECTION 5: RISK CONCENTRATION ========== -->
+<section id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Risk Concentration</h2>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th>Risk</th><th>Severity</th><th>Mitigation</th><th>Who Owns It</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>MuleSoft churn at Apr 29 renewal</strong><br>75-85% churn probability without intervention</td>
+          <td><span class="risk-high">HIGH</span></td>
+          <td>$25K 6-month bridge with milestones. Not a renewal negotiation — a structured POV. Mark needs to confirm by Mar 31.</td>
+          <td>Michael (AE) + Mark Edwards</td>
+        </tr>
+        <tr>
+          <td><strong>Agent sprawl — 4 ungoverned AI agents</strong><br>No unified HIPAA policy, no audit trail</td>
+          <td><span class="risk-high">HIGH</span></td>
+          <td>Agent Fabric deployment: Flex Gateway PII masking (Month 1), OpenClaw registration (Month 3), full audit trail (Month 6)</td>
+          <td>Mark Edwards + Knox Richardson</td>
+        </tr>
+        <tr>
+          <td><strong>CareStack overlap perception</strong><br>"Does MuleSoft duplicate what CareStack does?"</td>
+          <td><span class="risk-med">MEDIUM</span></td>
+          <td>Espire Dental proof point (30+ offices, 27M API calls through integration layer). Frame: Practice OS vs Nervous System.</td>
+          <td>Michael (AE) — must nail this framing</td>
+        </tr>
+        <tr>
+          <td><strong>No SI partner for implementation</strong><br>MuleSoft was never activated because no one built it</td>
+          <td><span class="risk-high">HIGH</span></td>
+          <td>Salesforce Professional Services engagement ($30-50K ProServ) or identify healthcare SI. This is why it failed last time.</td>
+          <td>Michael (AE) — broker ProServ intro</td>
+        </tr>
+        <tr>
+          <td><strong>Budget scrutiny from COO</strong><br>COO cut 52% CRM licenses Oct 2024</td>
+          <td><span class="risk-med">MEDIUM</span></td>
+          <td>$25K is less than 2 months of the current $44K run rate. Position as cost reduction (from $44K → $25K for 6 months) not new spend.</td>
+          <td>Angela Trull → COO internal sell</td>
+        </tr>
+        <tr>
+          <td><strong>PE exit readiness data gap</strong><br>No enterprise-level data aggregation for due diligence</td>
+          <td><span class="risk-med">MEDIUM</span></td>
+          <td>Board reporting API (Month 5) creates Norwest dashboard. Agent Visualizer produces exportable audit trail for PE due diligence.</td>
+          <td>Mark Edwards + Dr. Ryan Harris</td>
+        </tr>
+        <tr>
+          <td><strong>VoIP fragmentation</strong><br>Legacy + cloud mix across 62 offices</td>
+          <td><span class="risk-med">MEDIUM</span></td>
+          <td>Pilot VoIP Agent Fabric at 1 office (Month 3), scale to 10 (Month 4). Don't commit to all 62 until pilot validates.</td>
+          <td>Knox Richardson</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========== SECTION 6: WHAT CHANGES ========== -->
+<section id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>What Changes for Your Team</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card" style="border-left:4px solid var(--red);">
+      <h3>🛑 Stop Building</h3>
+      <ul style="font-size:0.9rem; padding-left:16px;">
+        <li>Manual referral data entry (40 min → automated)</li>
+        <li>Hand-compiled board reports from 62 offices</li>
+        <li>Point-to-point integrations between systems</li>
+        <li>Ungoverned AI agent deployments without HIPAA audit trail</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--yellow);">
+      <h3>🔄 Keep Building</h3>
+      <ul style="font-size:0.9rem; padding-left:16px;">
+        <li>CareStack rollout across remaining offices (MuleSoft accelerates this)</li>
+        <li>Salesforce recruitment pipeline (data now flows automatically)</li>
+        <li>OpenClaw AI capabilities (now governed under Agent Fabric)</li>
+        <li>DoctorLogic marketing programs (webhook integration already live)</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--green);">
+      <h3>✅ What's New</h3>
+      <ul style="font-size:0.9rem; padding-left:16px;">
+        <li>API-led architecture: System → Process → Experience layers</li>
+        <li>Agent Fabric: Registry, Broker, Flex Gateway, Visualizer</li>
+        <li>Reusable CareStack connector across all 62 instances</li>
+        <li>Enterprise reporting feed for Norwest</li>
+        <li>PII masking on all AI agent interactions</li>
+        <li>PE-ready audit trail for 2027-28 recap window</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 7: ROADMAP ========== -->
+<section id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>Implementation Roadmap — 6-Month Proof of Value</h2>
+  </div>
+
+  <div class="card">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">$25K</div>
+        <div class="stat-label">6-Month Investment</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">~$4.2K</div>
+        <div class="stat-label">Monthly Run Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">Apr 29</div>
+        <div class="stat-label">Start Date (Renewal)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">Oct 29</div>
+        <div class="stat-label">Go/No-Go Decision</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>Month 1 — Architecture Blueprint</h4>
+        <p>CareStack integration map. VoIP API audit across 62 offices. OpenClaw registered in Agent Registry. Flex Gateway PII masking live. <strong>Deliverable:</strong> Architecture blueprint document for Knox's team.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Month 2 — Referral Automation Live</h4>
+        <p>DoctorLogic → Salesforce → CareStack automated. 40-minute manual process eliminated. First documented ROI — measurable time savings for Angela's team. <strong>Go/No-Go Gate:</strong> Referral automation operational.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Month 3 — OpenClaw + Agent Fabric Pilot</h4>
+        <p>OpenClaw governed under Flex Gateway. Recruitment Concierge active (VoIP + Salesforce + AI candidate briefing). 1-office VoIP Agent Fabric pilot launched. <strong>Deliverable:</strong> Agent governance audit report.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Month 4 — VoIP Scale · 10 Offices</h4>
+        <p>Agent Fabric scaled to 10 locations. After-hours CareStack booking via AI agent live. Operational metrics dashboards for Mark's team. <strong>Go/No-Go Gate:</strong> VoIP pilot success metrics met.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Month 5 — Operational Intelligence + Board Reporting</h4>
+        <p>MuleSoft monitors live data streams — CareStack production, Salesforce pipeline, VoIP patterns. Trigger-based automation (cancellation alerts, no-show spikes, capacity flags). Norwest reporting pipeline unifies 62 offices into single board-deck feed.</p>
+      </div>
+      <div class="timeline-item">
+        <h4>Month 6 — Go/No-Go + ROI Package</h4>
+        <p>Documented ROI across all milestones. Full agent audit trail exportable for Norwest due diligence. <strong>Decision:</strong> Convert to annual at current rate — or clean off-board. Customer controls the outcome.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-warn callout">
+    <strong>POC Scope — IN vs OUT</strong>
+    <strong>IN:</strong> Referral automation, OpenClaw governance, VoIP pilot (1→10 offices), Norwest reporting, agent audit trail.<br>
+    <strong>OUT:</strong> Intelligent Document Processing (Phase 2), patient MDM/dedup (Phase 2 Informatica), full 62-office VoIP rollout (requires VoIP stack decision), CareStack billing integration (separate engagement).<br>
+    <strong>Go/No-Go Criteria:</strong> (1) Referral process automated and measured, (2) At least 2 AI agents governed under Flex Gateway, (3) Board reporting feed operational, (4) Documented time/cost savings.
+  </div>
+</section>
+
+<!-- ========== SECTION 8: COST-BENEFIT ========== -->
+<section id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Cost-Benefit Estimate</h2>
+  </div>
+
+  <div class="card">
+    <h3>Assumptions (Replace with Your Actuals)</h3>
+    <table>
+      <thead><tr><th>Input</th><th>Assumed Value</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Referral volume per month</td><td>200 referrals</td><td>Estimate — validate with Angela</td></tr>
+        <tr><td>Time per manual referral</td><td>40 minutes</td><td>Confirmed July 2025 call notes</td></tr>
+        <tr><td>Hourly cost of referral coordinator</td><td>$28/hr</td><td>Industry average — dental admin</td></tr>
+        <tr><td>New practice acquisitions per year</td><td>8–12</td><td>Based on $100M Norwest investment pace</td></tr>
+        <tr><td>Manual hours per new practice onboarding (IT)</td><td>80 hours</td><td>Estimate — validate with Knox</td></tr>
+        <tr><td>Board report prep time (per quarter)</td><td>40+ hours across ops team</td><td>Estimate — validate with Mark</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Year 1 Comparison</h3>
+    <table>
+      <thead><tr><th>Line Item</th><th>Without MuleSoft</th><th>With MuleSoft (6-Mo POV)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Referral labor cost (200/mo × 40 min × $28/hr)</td>
+          <td>$44,800/yr</td>
+          <td>~$4,500/yr (automated, 90% reduction)</td>
+        </tr>
+        <tr>
+          <td>IT onboarding per new practice</td>
+          <td>80 hrs × $75/hr = $6,000 each</td>
+          <td>20 hrs × $75/hr = $1,500 each (reusable APIs)</td>
+        </tr>
+        <tr>
+          <td>Board reporting labor (quarterly)</td>
+          <td>$12,000/yr (40 hrs × 4 × $75)</td>
+          <td>~$2,000/yr (automated feed)</td>
+        </tr>
+        <tr>
+          <td>HIPAA breach risk (shadow AI)</td>
+          <td><span class="risk-high">Unquantified — material</span></td>
+          <td>Governed under Flex Gateway</td>
+        </tr>
+        <tr>
+          <td>MuleSoft investment (6-mo POV)</td>
+          <td>$0 (churn)</td>
+          <td>$25,000</td>
+        </tr>
+        <tr style="font-weight:700; background:#F0F3F8;">
+          <td>Net Position (Year 1, conservative)</td>
+          <td>$56,800+ in manual costs + HIPAA exposure</td>
+          <td>$25,000 investment · $50,300+ in operational savings</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.8rem; color:var(--muted); margin-top:8px;">* Conservative estimates. Excludes PE valuation impact (4× EBITDA multiple gap = material at any projected exit revenue), agent sprawl risk mitigation, and compounding reuse value as new offices are acquired.</p>
+  </div>
+
+  <div class="card">
+    <h3>3-Year Compounding View</h3>
+    <table>
+      <thead><tr><th></th><th>Year 1</th><th>Year 2 (80 offices)</th><th>Year 3 (100+ offices)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Manual costs avoided</td>
+          <td>$50K+</td>
+          <td>$85K+ (more offices = more volume)</td>
+          <td>$120K+ (compounding)</td>
+        </tr>
+        <tr>
+          <td>New integration cost (per use case)</td>
+          <td>$15K (first build)</td>
+          <td>$3K (reuse existing APIs)</td>
+          <td>$3K (reuse existing APIs)</td>
+        </tr>
+        <tr>
+          <td>MuleSoft platform cost</td>
+          <td>$25K (POV) → $50K (annual)</td>
+          <td>$50K</td>
+          <td>$50K</td>
+        </tr>
+        <tr style="font-weight:700; background:#E8F5E9;">
+          <td>Cumulative ROI</td>
+          <td>Break-even</td>
+          <td>$85K+ net positive</td>
+          <td>$200K+ net positive</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.8rem; color:var(--muted); margin-top:8px;">The compounding effect: Every API built for one use case is reused for the next. At 100+ offices, the per-office integration cost approaches zero because the CareStack connector, Salesforce API, and reporting feed are already built.</p>
+  </div>
+
+  <div class="ask-gaurav">Review cost assumptions. The 90% referral automation reduction is aggressive — should we model 70% for conservative scenario? Also validate ProServ pricing range ($30-50K) for this scope.</div>
+</section>
+
+<!-- ========== SECTION 9: PERSONA VALUE ========== -->
+<section id="s9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Persona-Specific Value</h2>
+  </div>
+
+  <div class="persona-grid">
+    <div class="persona-card cgo">
+      <h4>Angela Trull — Chief Growth Officer</h4>
+      <p style="font-size:0.85rem; margin-bottom:8px;"><strong>Her world:</strong> Doctor recruitment, practice growth, referral pipeline at 62 locations scaling to 100+.</p>
+      <ul>
+        <li><strong>Referral automation</strong> — 40-min manual process eliminated. Her team stops being "human glue" between systems</li>
+        <li><strong>Recruitment Concierge</strong> — AI-powered candidate briefing before recruiter answers the phone. Protects 95%+ close rate at scale</li>
+        <li><strong>Growth dashboard</strong> — real-time view across all offices, not manually compiled reports</li>
+      </ul>
+      <p style="font-size:0.82rem; margin-top:8px; color:var(--muted);"><em>"Angela, you've built an incredible growth engine. Right now, your team is acting as the human glue between your systems. Let's right-size your MuleSoft investment to build the infrastructure so you can focus on the next $100M in growth."</em></p>
+    </div>
+
+    <div class="persona-card vp-tech">
+      <h4>Mark Edwards — VP Technology & Innovation</h4>
+      <p style="font-size:0.85rem; margin-bottom:8px;"><strong>His world:</strong> CareStack rollout, integration architecture, AI tool evaluation (DaVita healthcare IT background).</p>
+      <ul>
+        <li><strong>CareStack integration bridge</strong> — MuleSoft doesn't compete with CareStack. It connects CareStack to everything else. Espire Dental proof point validates at scale</li>
+        <li><strong>Agent governance</strong> — OpenClaw + VoiceStack + Agentforce governed under single Flex Gateway policy. One HIPAA audit trail</li>
+        <li><strong>PE-ready observability</strong> — Agent Visualizer produces exportable audit trail for due diligence</li>
+      </ul>
+      <p style="font-size:0.82rem; margin-top:8px; color:var(--muted);"><em>"Mark, you need a 6-month proof-of-value, not a month-to-month. This gives you documented milestones, a clean go/no-go, and the architecture blueprint your team needs. You control the outcome."</em></p>
+    </div>
+
+    <div class="persona-card board">
+      <h4>Dr. Ryan Harris — GP, Norwest Venture Partners</h4>
+      <p style="font-size:0.85rem; margin-bottom:8px;"><strong>His world:</strong> $100M invested Jun 2023. Recap window 2027-28. EBITDA multiple at exit.</p>
+      <ul>
+        <li><strong>8× vs 12× EBITDA gap</strong> — fragmented DSOs exit at 8×. Platform businesses exit at 12×. Same revenue, different infrastructure story</li>
+        <li><strong>SDP cautionary tale</strong> — same vintage, 3.6× larger, hit the wall with 12 PMS systems. CEO: "We'll make mistakes"</li>
+        <li><strong>$25K = insurance premium</strong> — keeps integration foundation alive through recap window. Board-level air cover, not operational detail</li>
+      </ul>
+      <p style="font-size:0.82rem; margin-top:8px; color:var(--muted);"><em>"The $25K decision is a valuation decision for 2027-28. What determines the multiple is what a due diligence team finds when they open the hood."</em></p>
+    </div>
+
+    <div class="persona-card" style="border-left-color: var(--infa-orange);">
+      <h4>Phase 2 — Informatica IDMC (Future Play at 100+ Offices)</h4>
+      <p style="font-size:0.85rem; margin-bottom:8px;"><strong>When:</strong> HighFive crosses 80-100 offices with divergent CareStack instances.</p>
+      <ul>
+        <li><strong>Patient MDM</strong> — Golden record across 100+ CareStack instances. Probabilistic matching, survivorship rules, merge/unmerge</li>
+        <li><strong>Provider data quality</strong> — Standardize provider/location data for referring physician networks</li>
+        <li><strong>Reference data management</strong> — Clinical code standardization across practices</li>
+      </ul>
+      <p style="font-size:0.82rem; margin-top:8px; color:var(--muted);"><em>Not in 6-month scope. Plant the seed: "When you're at 100 offices, the data quality problem becomes the growth ceiling. We solve that too."</em></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <div class="container">
+    <p>HighFive Healthcare — Enterprise Integration Architecture Brief</p>
+    <p style="margin-top:4px;">Generated by <strong>SmokinArchitect</strong> · MuleSoft Healthcare · March 2026</p>
+    <p style="margin-top:4px; font-size:0.78rem; opacity:0.7;">Account: 0010M00001XxvI6QAJ · Confidential — For Internal Use + Customer Presentation</p>
+    <p style="margin-top:12px; font-size:0.78rem; opacity:0.6;">Engagement tracking pixel intentionally omitted for test drive. Production deploys include beacon.</p>
+  </div>
+</footer>
+
+</body>
+</html>
